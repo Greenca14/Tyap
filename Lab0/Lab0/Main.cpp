@@ -45,7 +45,7 @@ int main() {
 	bool comm = false;
 
 	if (!inFile.is_open() || !outFile.is_open()) {
-		std::cerr << "Îøèáêà îòêðûòèÿ ôàéëîâ." << std::endl;
+		std::cerr << "ÃŽÃ¸Ã¨Ã¡ÃªÃ  Ã®Ã²ÃªÃ°Ã»Ã²Ã¨Ã¿ Ã´Ã Ã©Ã«Ã®Ã¢." << std::endl;
 		return 1;
 	}
 
@@ -64,10 +64,10 @@ int main() {
 			}	
 		}
 		outFile << res << endl;
-		res = ' ';
+		res = "";
 	}
 
-	cout << "Ìíîãîñòðî÷íûå êîììåíòàðèè óñïåøíî óäàëåíû!" << endl;
+	cout << "ÃŒÃ­Ã®Ã£Ã®Ã±Ã²Ã°Ã®Ã·Ã­Ã»Ã¥ ÃªÃ®Ã¬Ã¬Ã¥Ã­Ã²Ã Ã°Ã¨Ã¨ Ã³Ã±Ã¯Ã¥Ã¸Ã­Ã® Ã³Ã¤Ã Ã«Ã¥Ã­Ã»!" << endl;
 
 	inFile.close();
 	outFile.close();
