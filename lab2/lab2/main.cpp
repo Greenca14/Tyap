@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 					State = Stroka;
 					outFile.put('\"');
 				}
-				else if (c == '_' || (c >= '65' && c<= '122')) {
+				else if (c == '_' || (c >= 'A' && c <= 'Z') ||(c >= 'a' && c <= 'z')) {
 					State = Block;
 				}
 				else if (c == '0') {
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
 				State = Stroka;
 				break;
 			case Block:
-				if (c == '_' || (c >= '65' && c <= '122')) {
+				if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
 				}
 				else if (c == '/') {
@@ -153,9 +153,17 @@ int main(int argc, char** argv) {
 					State = Vosmir;
 					outFile << c;
 				}
-				else if (c == '_' || (c >= '65' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
+				}
+				else if (c == 'u' || c == 'U') {
+					State = Unsigned;
+					outFile << c;
+				}
+				else if (c == 'l' || c == 'L') {
+					State = Long;
+					outFile << c;
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -168,17 +176,25 @@ int main(int argc, char** argv) {
 				}
 				break;
 			case Shesnad:
-				if ((c >= '0' && c <= '9') || (c >= '65' && c <= '70')) {
+				if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) {
 					State = Shesnad;
 					outFile << c;
 				}
-				else if (c >= '65' && c <= '122') {
+				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Normal;
 					outFile << c << "\t Shestnadcatirichnaia";
 				}
-				else if (c == '_' || (c >= '65' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
+				}
+				else if (c == 'u' || c == 'U') {
+					State = Unsigned;
+					outFile << c;
+				}
+				else if (c == 'l' || c == 'L') {
+					State = Long;
+					outFile << c;
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -195,13 +211,21 @@ int main(int argc, char** argv) {
 					State = Vosmir;
 					outFile << c;
 				}
-				else if (c >= '65' && c <= '122') {
+				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Normal;
 					outFile << c << "\t Vosmirichnaia";
 				}
-				else if (c == '_' || (c >= '65' && c <= '122') || c == '8' || c == '9') {
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '8' || c == '9') {
 					State = Block;
 					outFile << c << "\tError";
+				}
+				else if (c == 'u' || c == 'U') {
+					State = Unsigned;
+					outFile << c;
+				}
+				else if (c == 'l' || c == 'L') {
+					State = Long;
+					outFile << c;
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -218,19 +242,19 @@ int main(int argc, char** argv) {
 					State = Desatich;
 					outFile << c;
 				}
-				else if (c == '_' || (c >= '65' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
 				}
-				else if (c >= '65' && c <= '122') {
+				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Normal;
 					outFile << c << "\t Desiatichnaia";
 				}
-				else if (c == '85' || c == '117') {
+				else if (c == 'U' || c == 'u') {
 					State = Unsigned;
 					outFile << c;
 				}
-				else if (c == '76' || c == '108') {
+				else if (c == 'L' || c == 'l') {
 					State = Long;
 					outFile << c;
 				}
@@ -249,11 +273,11 @@ int main(int argc, char** argv) {
 					State = Normal;
 					outFile << c << "\tUnsigned";
 				}
-				else if (c == '76' || c == '108') {
+				else if (c == 'L' || c == 'l') {
 					State = UnLong;
 					outFile << c;
 				}
-				else if (c == '_' || (c >= '65' && c < '76') || (c > '76' && c <= '90') || (c >= '97' && c < '108') || (c > '108' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
 				}
@@ -276,7 +300,7 @@ int main(int argc, char** argv) {
 					State = UnLongLong;
 					outFile << c;
 				}
-				else if (c == '_' || (c >= '65' && c < '76') || (c > '76' && c <= '90') || (c >= '97' && c < '108') || (c > '108' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
 				}
@@ -314,11 +338,11 @@ int main(int argc, char** argv) {
 					State = Normal;
 					outFile << c << "\tLong";
 				}
-				else if (c == '76' || c == '108') {
+				else if (c == 'L' || c == 'l') {
 					State = LongLong;
 					outFile << c;
 				}
-				else if (c == '_' || (c >= '65' && c < '76') || (c > '76' && c <= '90') || (c >= '97' && c < '108') || (c > '108' && c <= '122')) {
+				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
 					outFile << c << "\tError";
 				}
@@ -340,6 +364,10 @@ int main(int argc, char** argv) {
 				else if (c != ' ') {
 					State = Block;
 					outFile << c << "\tError";
+				}
+				else if (c == 'u' || c == 'U') {
+					State = UnLongLong;
+					outFile << c;
 				}
 				else if (c == '/') {
 					State = Slash;
