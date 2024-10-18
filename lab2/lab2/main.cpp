@@ -30,11 +30,9 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\'') {
 					State = Odinar;
-					outFile.put('\'');
 				}
 				else if (c == '\"') {
 					State = Stroka;
-					outFile.put('\"');
 				}
 				else if (c == '_' || (c >= 'A' && c <= 'Z') ||(c >= 'a' && c <= 'z')) {
 					State = Block;
@@ -43,11 +41,8 @@ int main(int argc, char** argv) {
 					State = Nol;
 					outFile.put(c);
 				}
-				else if (c <= '1' && c >= '9') {
+				else if (c >= '1' && c <= '9') {
 					State = Desatich;
-					outFile.put(c);
-				}
-				else {
 					outFile.put(c);
 				}
 				break;
@@ -60,17 +55,13 @@ int main(int argc, char** argv) {
 				}
 				else {
 					State = Normal;
-					outFile.put('/');
-					outFile.put(c);
 				}
 				break;
 			case SlashSlash:
 				if (c == '\n') {
-					outFile.put('\n');
 					State = Normal;
 				}
 				if (c == '\r') {
-					outFile.put('\r');
 					State = Normal;
 				}
 				break;
@@ -92,39 +83,27 @@ int main(int argc, char** argv) {
 			case Odinar:
 				if (c == '\'') {
 					State = Normal;
-					outFile.put('\'');
 				}
 				else if (c == '\\') {
 					State = SlashOdinar;
-					outFile.put('\\');
-				}
-				else {
-					outFile.put(c);
 				}
 				break;
 			case Stroka:
 				if (c == '\"') {
 					State = Normal;
-					outFile.put('\"');
 				}
 				else if (c == '\\') {
 					State = SlashStroka;
-					outFile.put('\\');
-				}
-				else {
-					outFile.put(c);
 				}
 				break;
 			case SlashOdinar:
-				outFile.put(c);
 				State = Odinar;
 				break;
 			case SlashStroka:
-				outFile.put(c);
 				State = Stroka;
 				break;
 			case Block:
-				if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+				if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
 					State = Block;
 				}
 				else if (c == '/') {
@@ -141,11 +120,7 @@ int main(int argc, char** argv) {
 				}
 				break;
 			case Nol:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tint";
-				}
-				else if (c == 'x') {
+				if (c == 'x') {
 					State = Shesnad;
 					outFile << c;
 				}
@@ -155,7 +130,7 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == 'u' || c == 'U') {
 					State = Unsigned;
@@ -173,6 +148,10 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\"') {
 					State = Stroka;
+				}
+				else {
+					State = Normal;
+					outFile << "\tint\n";
 				}
 				break;
 			case Shesnad:
@@ -180,13 +159,9 @@ int main(int argc, char** argv) {
 					State = Shesnad;
 					outFile << c;
 				}
-				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-					State = Normal;
-					outFile << c << "\t Shestnadcatirichnaia";
-				}
 				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == 'u' || c == 'U') {
 					State = Unsigned;
@@ -204,6 +179,10 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\"') {
 					State = Stroka;
+				}
+				else {
+					State = Normal;
+					outFile << "\tShestnadcatirichnaia\n";
 				}
 				break;
 			case Vosmir:
@@ -211,13 +190,9 @@ int main(int argc, char** argv) {
 					State = Vosmir;
 					outFile << c;
 				}
-				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-					State = Normal;
-					outFile << c << "\t Vosmirichnaia";
-				}
 				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '8' || c == '9') {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == 'u' || c == 'U') {
 					State = Unsigned;
@@ -236,19 +211,15 @@ int main(int argc, char** argv) {
 				else if (c == '\"') {
 					State = Stroka;
 				}
+				else {
+					State = Normal;
+					outFile << "\tVosmirichnaia\n";
+				}
 				break;
 			case Desatich:
 				if (c >= '0' && c <= '9') {
 					State = Desatich;
 					outFile << c;
-				}
-				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-					State = Block;
-					outFile << c << "\tError";
-				}
-				else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
-					State = Normal;
-					outFile << c << "\t Desiatichnaia";
 				}
 				else if (c == 'U' || c == 'u') {
 					State = Unsigned;
@@ -258,6 +229,10 @@ int main(int argc, char** argv) {
 					State = Long;
 					outFile << c;
 				}
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+					State = Block;
+					outFile << "\tError\n";
+				}
 				else if (c == '/') {
 					State = Slash;
 				}
@@ -267,19 +242,19 @@ int main(int argc, char** argv) {
 				else if (c == '\"') {
 					State = Stroka;
 				}
+				else {
+					State = Normal;
+					outFile << "\tDesiatichnaia\n";
+				}
 				break;
 			case Unsigned:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tUnsigned";
-				}
-				else if (c == 'L' || c == 'l') {
+				if (c == 'L' || c == 'l') {
 					State = UnLong;
 					outFile << c;
 				}
 				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -290,19 +265,19 @@ int main(int argc, char** argv) {
 				else if (c == '\"') {
 					State = Stroka;
 				}
+				else {
+					State = Normal;
+					outFile << "\tUnsigned\n";
+				}
 				break;
 			case UnLong:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tUnsigned Long";
-				}
-				else if (c == '76' || c == '108') {
+				if (c == 'L' || c == 'l') {
 					State = UnLongLong;
 					outFile << c;
 				}
 				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -312,16 +287,16 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\"') {
 					State = Stroka;
+				}
+				else {
+					State = Normal;
+					outFile << "\tUnsigned Long\n";
 				}
 				break;
 			case UnLongLong:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tUnsigned Long Long";
-				}
-				else if (c != ' ') {
+				if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -332,19 +307,19 @@ int main(int argc, char** argv) {
 				else if (c == '\"') {
 					State = Stroka;
 				}
+				else{
+					State = Normal;
+					outFile << "\tUnsigned Long Long\n";
+				}
 				break;
 			case Long:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tLong";
-				}
-				else if (c == 'L' || c == 'l') {
+				if (c == 'L' || c == 'l') {
 					State = LongLong;
 					outFile << c;
 				}
 				else if (c == '_' || (c >= 'A' && c < 'L') || (c > 'L' && c <= 'Z') || (c >= 'a' && c < 'l') || (c > 'l' && c <= 'z')) {
 					State = Block;
-					outFile << c << "\tError";
+					outFile << "\tError\n";
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -354,20 +329,20 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\"') {
 					State = Stroka;
+				}
+				else {
+					State = Normal;
+					outFile << "\tLong\n";
 				}
 				break;
 			case LongLong:
-				if (c == ' ') {
-					State = Normal;
-					outFile << c << "\tLong Long";
-				}
-				else if (c != ' ') {
-					State = Block;
-					outFile << c << "\tError";
-				}
-				else if (c == 'u' || c == 'U') {
+				if (c == 'u' || c == 'U') {
 					State = UnLongLong;
 					outFile << c;
+				}
+				else if (c == '_' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+					State = Block;
+					outFile << "\tError\n";
 				}
 				else if (c == '/') {
 					State = Slash;
@@ -377,6 +352,10 @@ int main(int argc, char** argv) {
 				}
 				else if (c == '\"') {
 					State = Stroka;
+				}
+				else {
+					State = Normal;
+					outFile << "\tLong Long\n";
 				}
 				break;
 			}
