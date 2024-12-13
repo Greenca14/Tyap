@@ -1,4 +1,4 @@
-﻿/*S→I=E; Операторы присваивания переменной с именем I значения выражения E. Переменная с именем I определяется, если она не была определена ранее
+/*S→I=E; Операторы присваивания переменной с именем I значения выражения E. Переменная с именем I определяется, если она не была определена ранее
 
 E→E+T|E-T|T Выражения с традиционными арифметическими операциями +, –,*, / и круглыми скобками
 T→T*M|T/M|M
@@ -262,78 +262,61 @@ void Analyzer::writeTriads(ofstream& output) {
 }
 
 void Analyzer::optimizeTriads() {
-    vector<bool> markedForRemoval(triads.size(), false);
+    vector<bool> marked(triads.size(), false);
 
     for (size_t i = 0; i < triads.size(); ++i) {
-        if (!markedForRemoval[i]) {
-            // Проверяем условия последовательно
-            applyConstantReplacement(i, markedForRemoval);//1
-            evaluateConstantOperations(i, markedForRemoval);//3
-            applyVariableReplacement(i, markedForRemoval);//4
+        if (!marked[i]) {
+            applyConstantReplacement(i, marked);//1
+            evaluateConstantOperations(i, marked);//3
+            applyVariableReplacement(i, marked);//4
         }
     }
 
-    // Удаляем помеченные тройники
     for (size_t i = 0; i < triads.size(); ++i) {
-        if (markedForRemoval[i]) {
-            triads[i].op = "R";
+        if (marked[i]) {
+            triads[i].op = "M";
         }
     }
 }
 
-void Analyzer::applyConstantReplacement(size_t i, vector<bool>& markedForRemoval) {
+void Analyzer::applyConstantReplacement(size_t i, vector<bool>& marked) {
     const Triad& triad = triads[i];
     if (triad.op != "=" && triad.op2[0] == '^') {
-        size_t index = 0;
-        size_t leftIndex = 0;
-        for (size_t j = 1; j < triad.op2.size(); ++j) {
-            leftIndex = index * 10 + (triad.op2[j] - '0'); // конвертация вручную
-        }
-        index--;
+        size_t index = stoi(triad.op2.substr(1)) - 1;
         if (triads[index].op == "C") {
             triads[i].op2 = triads[index].op1;
-            markedForRemoval[index] = true;
+            marked[index] = true;
         }
     }
 }
 
-void Analyzer::evaluateConstantOperations(size_t i, vector<bool>& markedForRemoval) {
+void Analyzer::evaluateConstantOperations(size_t i, vector<bool>& marked) {
     const Triad& triad = triads[i];
     if (triad.op != "=" && triad.op1[0] == '^' && triad.op2[0] != '^') {
-        size_t index = 0;
-        size_t leftIndex = 0;
-        for (size_t j = 1; j < triad.op2.size(); ++j) {
-            leftIndex = index * 10 + (triad.op2[j] - '0'); // конвертация вручную
-        }
-        index--;
+        size_t leftIndex = stoi(triad.op1.substr(1)) - 1;
         if (triads[leftIndex].op == "C" && isdigit(triad.op2[0])) {
-            int leftValue = stoi(triads[leftIndex].op1);
-            int rightValue = stoi(triad.op2);
+            int leftOp = stoi(triads[leftIndex].op1);
+            int rightOp = stoi(triad.op2);
             int result = 0;
 
-            if (triad.op == "+") result = leftValue + rightValue;
-            else if (triad.op == "-") result = leftValue - rightValue;
-            else if (triad.op == "*") result = leftValue * rightValue;
-            else if (triad.op == "/") result = leftValue / rightValue;
+            if (triad.op == "+") result = leftOp + rightOp;
+            else if (triad.op == "-") result = leftOp - rightOp;
+            else if (triad.op == "*") result = leftOp * rightOp;
+            else if (triad.op == "/") result = leftOp / rightOp;
 
             triads[i] = { "C", to_string(result), "Ø" };
-            markedForRemoval[leftIndex] = true;
+            marked[leftIndex] = true;
         }
     }
 }
 
-void Analyzer::applyVariableReplacement(size_t i, vector<bool>& markedForRemoval) {
+void Analyzer::applyVariableReplacement(size_t i, vector<bool>& marked) {
     const Triad& triad = triads[i];
     if (triad.op == "=" && triad.op1[0] == '^') {
-        size_t index = 0;
-        size_t leftIndex = 0;
-        for (size_t j = 1; j < triad.op2.size(); ++j) {
-            leftIndex = index * 10 + (triad.op2[j] - '0'); // конвертация вручную
-        }
-        index--;
+        size_t leftIndex = stoi(triad.op1.substr(1)) - 1;
         if (triads[leftIndex].op == "V") {
             triads[i].op1 = triads[leftIndex].op1;
-            markedForRemoval[leftIndex] = true;
+            marked[leftIndex] = true;
         }
     }
 }
@@ -341,7 +324,7 @@ void Analyzer::applyVariableReplacement(size_t i, vector<bool>& markedForRemoval
 void Analyzer::writeOptimizedTriads(ofstream& output) {
     output << "Optimized Triads:" << endl;
     for (size_t i = 0; i < triads.size(); ++i) {
-        if (triads[i].op != "R") {
+        if (triads[i].op != "M") {
             output << i + 1 << ": " << triads[i].op << "(" << triads[i].op1 << ", " << triads[i].op2 << ")" << endl;
         }
     }
